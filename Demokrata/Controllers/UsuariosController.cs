@@ -1,6 +1,5 @@
 ﻿using Demokrata.DTOs;
 using Demokrata.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Demokrata.Controllers
@@ -24,15 +23,19 @@ namespace Demokrata.Controllers
             try
             {
                 var usuario = await _usuarioService.GetByIdAsync(id);
-                if (usuario == null) return NotFound(new { message = "Usuario no encontrado." });
+                if (usuario == null)
+                {
+                    return NotFound(new { code = 404, message = "Usuario no encontrado." });
+                }
 
-                return Ok(usuario);
+                return Ok(new { code = 200, message = "Usuario obtenido exitosamente.", data = usuario });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al obtener el usuario con ID {id}");
-                return StatusCode(StatusCodes.Status500InternalServerError, new
+                return StatusCode(500, new
                 {
+                    code = 500,
                     message = "Ocurrió un error al intentar obtener el usuario.",
                     details = ex.Message
                 });
@@ -45,37 +48,82 @@ namespace Demokrata.Controllers
             try
             {
                 var usuarios = await _usuarioService.GetAllAsync();
-                return Ok(usuarios);
+                return Ok(new { code = 200, message = "Usuarios obtenidos exitosamente.", data = usuarios });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener la lista de usuarios");
-                return StatusCode(StatusCodes.Status500InternalServerError, new
+                return StatusCode(500, new
                 {
+                    code = 500,
                     message = "Ocurrió un error al intentar obtener la lista de usuarios.",
+                    details = ex.Message
+                });
+            }
+        }
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(string? primerNombre, string? primerApellido, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                if (pageNumber <= 0 || pageSize <= 0)
+                {
+                    return BadRequest(new { code = 400, message = "Los parámetros pageNumber y pageSize deben ser mayores a 0." });
+                }
+
+                var usuarios = await _usuarioService.SearchAsync(primerNombre, primerApellido, pageNumber, pageSize);
+
+                return Ok(new
+                {
+                    code = 200,
+                    message = "Usuarios obtenidos exitosamente.",
+                    data = usuarios.Data,
+                    totalRecords = usuarios.TotalRecords,
+                    pageNumber,
+                    pageSize
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al realizar la búsqueda de usuarios.");
+                return StatusCode(500, new
+                {
+                    code = 500,
+                    message = "Ocurrió un error al intentar buscar usuarios.",
                     details = ex.Message
                 });
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(UsuarioDTO usuarioDto)
+        public async Task<IActionResult> Create([FromBody] UsuarioDTO usuarioDto)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(new { message = "Datos inválidos.", errors = ModelState });
+                    return BadRequest(new
+                    {
+                        code = 400,
+                        message = "Datos inválidos.",
+                        errors = ModelState
+                    });
                 }
 
                 var usuario = await _usuarioService.CreateAsync(usuarioDto);
-                return CreatedAtAction(nameof(GetById), new { id = usuario.Id }, usuario);
+                return CreatedAtAction(nameof(GetById), new { id = usuario.Id }, new
+                {
+                    code = 201,
+                    message = "Usuario creado exitosamente.",
+                    data = usuario
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al crear un usuario");
-                return StatusCode(StatusCodes.Status500InternalServerError, new
+                return StatusCode(500, new
                 {
+                    code = 500,
                     message = "Ocurrió un error al intentar crear el usuario.",
                     details = ex.Message
                 });
@@ -83,25 +131,34 @@ namespace Demokrata.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, UsuarioDTO usuarioDto)
+        public async Task<IActionResult> Update(int id, [FromBody] UsuarioDTO usuarioDto)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(new { message = "Datos inválidos.", errors = ModelState });
+                    return BadRequest(new
+                    {
+                        code = 400,
+                        message = "Datos inválidos.",
+                        errors = ModelState
+                    });
                 }
 
                 var result = await _usuarioService.UpdateAsync(id, usuarioDto);
-                if (!result) return NotFound(new { message = "Usuario no encontrado." });
+                if (!result)
+                {
+                    return NotFound(new { code = 404, message = "Usuario no encontrado para actualizar." });
+                }
 
-                return NoContent(); // Código 204 sin contenido
+                return Ok(new { code = 200, message = "Usuario actualizado exitosamente." });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al actualizar el usuario con ID {id}");
-                return StatusCode(StatusCodes.Status500InternalServerError, new
+                return StatusCode(500, new
                 {
+                    code = 500,
                     message = "Ocurrió un error al intentar actualizar el usuario.",
                     details = ex.Message
                 });
@@ -114,15 +171,19 @@ namespace Demokrata.Controllers
             try
             {
                 var result = await _usuarioService.DeleteAsync(id);
-                if (!result) return NotFound(new { message = "Usuario no encontrado." });
+                if (!result)
+                {
+                    return NotFound(new { code = 404, message = "Usuario no encontrado para eliminar." });
+                }
 
-                return NoContent(); // Código 204 sin contenido
+                return Ok(new { code = 200, message = "Usuario eliminado exitosamente." });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al eliminar el usuario con ID {id}");
-                return StatusCode(StatusCodes.Status500InternalServerError, new
+                return StatusCode(500, new
                 {
+                    code = 500,
                     message = "Ocurrió un error al intentar eliminar el usuario.",
                     details = ex.Message
                 });

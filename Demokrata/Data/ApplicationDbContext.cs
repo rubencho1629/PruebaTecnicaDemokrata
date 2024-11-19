@@ -13,16 +13,45 @@ namespace Demokrata.Data
         {
             modelBuilder.Entity<Usuario>(entity =>
             {
-                entity.Property(u => u.PrimerNombre).IsRequired().HasMaxLength(50);
-                entity.Property(u => u.PrimerApellido).IsRequired().HasMaxLength(50);
+                entity.Property(u => u.PrimerNombre)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("nvarchar")
+                    .HasComment("Primer nombre del usuario");
 
-                // Configuración para la columna Sueldo
+                entity.Property(u => u.SegundoNombre)
+                    .HasMaxLength(50)
+                    .HasColumnType("nvarchar")
+                    .HasComment("Segundo nombre del usuario");
+
+                entity.Property(u => u.PrimerApellido)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("nvarchar")
+                    .HasComment("Primer apellido del usuario");
+
+                entity.Property(u => u.SegundoApellido)
+                    .HasMaxLength(50)
+                    .HasColumnType("nvarchar")
+                    .HasComment("Segundo apellido del usuario");
+
+                entity.Property(u => u.FechaNacimiento)
+                    .IsRequired()
+                    .HasColumnType("datetime2");
+
                 entity.Property(u => u.Sueldo)
                     .IsRequired()
-                    .HasColumnType("decimal(18,2)"); // Máximo 18 dígitos, 2 decimales
+                    .HasColumnType("decimal(18,2)");
 
-                entity.Property(u => u.FechaCreacion).HasDefaultValueSql("GETDATE()");
-                entity.Property(u => u.FechaModificacion).HasDefaultValueSql("GETDATE()");
+                entity.Property(u => u.FechaCreacion)
+                    .IsRequired()
+                    .HasDefaultValueSql("GETDATE()")
+                    .HasColumnType("datetime2");
+
+                entity.Property(u => u.FechaModificacion)
+                    .IsRequired()
+                    .HasDefaultValueSql("GETDATE()")
+                    .HasColumnType("datetime2");
             });
         }
     }

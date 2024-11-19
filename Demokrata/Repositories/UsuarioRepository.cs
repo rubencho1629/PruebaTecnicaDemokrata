@@ -29,6 +29,32 @@ namespace Demokrata.Repositories
             await _context.SaveChangesAsync();
             return usuario;
         }
+        public async Task<(IEnumerable<Usuario> Data, int TotalRecords)> SearchAsync(string? primerNombre, string? primerApellido, int pageNumber, int pageSize)
+        {
+            var query = _context.Usuarios.AsQueryable();
+
+            if (!string.IsNullOrEmpty(primerNombre))
+            {
+                query = query.Where(u => u.PrimerNombre.Contains(primerNombre));
+            }
+
+            if (!string.IsNullOrEmpty(primerApellido))
+            {
+                query = query.Where(u => u.PrimerApellido.Contains(primerApellido));
+            }
+
+            // Total de registros
+            var totalRecords = await query.CountAsync();
+
+            // Aplicar paginación
+            var data = await query
+                .OrderBy(u => u.PrimerNombre) 
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (data, totalRecords);
+        }
 
         public async Task<bool> UpdateAsync(int id, Usuario usuario)
         {

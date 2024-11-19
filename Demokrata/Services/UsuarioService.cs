@@ -16,9 +16,20 @@ namespace Demokrata.Services
         public async Task<Usuario?> GetByIdAsync(int id) => await _usuarioRepository.GetByIdAsync(id);
 
         public async Task<IEnumerable<Usuario>> GetAllAsync() => await _usuarioRepository.GetAllAsync();
+        public async Task<(IEnumerable<Usuario> Data, int TotalRecords)> SearchAsync(string? primerNombre, string? primerApellido, int pageNumber, int pageSize)
+        {
+            return await _usuarioRepository.SearchAsync(primerNombre, primerApellido, pageNumber, pageSize);
+        }
+
 
         public async Task<Usuario> CreateAsync(UsuarioDTO usuarioDto)
         {
+            // Validación personalizada para Fecha de Nacimiento
+            if (usuarioDto.FechaNacimiento > DateTime.UtcNow)
+            {
+                throw new ArgumentException("La fecha de nacimiento no puede ser en el futuro.");
+            }
+         
             var usuario = new Usuario
             {
                 PrimerNombre = usuarioDto.PrimerNombre,
@@ -30,6 +41,7 @@ namespace Demokrata.Services
                 FechaCreacion = DateTime.UtcNow,
                 FechaModificacion = DateTime.UtcNow
             };
+
             return await _usuarioRepository.CreateAsync(usuario);
         }
 

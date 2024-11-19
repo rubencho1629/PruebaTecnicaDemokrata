@@ -1,4 +1,5 @@
 using Demokrata.Data;
+using Demokrata.Filters;
 using Demokrata.Repositories;
 using Demokrata.Services;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,10 @@ builder.Services.AddCors(options =>
 });
 
 // Agrega servicios al contenedor
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<ExceptionFilter>();
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
