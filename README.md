@@ -1,106 +1,62 @@
-Demokrata
+# Demokrata
 
-Demokrata es un proyecto que implementa un API REST para la gestión de usuarios. Este API permite realizar operaciones básicas de CRUD (Crear, Leer, Actualizar, Eliminar) sobre una base de datos, incluyendo la búsqueda por ID y búsqueda paginada por nombre o apellido.
-Características principales
+Demokrata es una aplicación ASP.NET Core para la gestión de usuarios. Este proyecto incluye una API RESTful que permite realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre los usuarios.
 
-    Tecnología: .NET 8
-    Base de datos: SQL Server
-    Operaciones CRUD: Crear, Leer, Actualizar y Eliminar usuarios.
-    Búsquedas:
-        Por ID.
-        Por nombre/apellido con paginación.
-    Validaciones:
-        Reglas estrictas para los campos, incluyendo validaciones de longitud, tipos de datos y restricciones de negocio.
-    Pruebas:
-        Unitarias y de integración utilizando xUnit y Moq.
-    Documentación: Integración con Swagger para explorar los endpoints.
+## Estructura del Proyecto
 
-Requisitos previos
+- **Demokrata**: Contiene la aplicación principal.
+  - **Controllers**: Controladores de la API.
+  - **Data**: Contexto de la base de datos.
+  - **DTOs**: Objetos de transferencia de datos.
+  - **Filters**: Filtros personalizados.
+  - **Mappings**: Configuración de AutoMapper.
+  - **Migrations**: Migraciones de Entity Framework.
+  - **Models**: Modelos de datos.
+  - **Repositories**: Repositorios para acceso a datos.
+  - **Services**: Servicios de negocio.
+  - **Properties**: Configuraciones del proyecto.
+  - **Program.cs**: Configuración de inicio de la aplicación.
+  - **appsettings.json**: Configuración de la aplicación.
+  - **appsettings.Development.json**: Configuración de la aplicación para el entorno de desarrollo.
 
-    .NET 8 SDK instalado. Descargar aquí.
-    SQL Server configurado y corriendo localmente o en la nube.
-    Herramientas de desarrollo como Visual Studio o Visual Studio Code.
-    Administrador de paquetes como NuGet.
+- **Demokrata.Tests**: Contiene las pruebas unitarias y de integración.
+  - **Controllers**: Pruebas para los controladores.
+  - **Services**: Pruebas para los servicios.
 
-Configuración del proyecto
-1. Clonar el repositorio
+## Configuración
 
-git clone <URL del repositorio>
-cd Demokrata
+### Requisitos
 
-2. Configurar la cadena de conexión
+- .NET 8.0 SDK
+- SQL Server
 
-En el archivo appsettings.json, configura la conexión a tu base de datos SQL Server:
+### Configuración de la Base de Datos
 
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=Demokrata;Trusted_Connection=True;"
-  }
+Asegúrate de tener una instancia de SQL Server en ejecución y actualiza la cadena de conexión en `appsettings.json`:
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=TU_SERVIDOR;Database=Demokrata;Trusted_Connection=True;TrustServerCertificate=True;"
 }
 
-3. Crear la base de datos
 
-Ejecuta las migraciones para crear la base de datos y las tablas:
+Migraciones de Entity Framework
 
+Para aplicar las migraciones y crear la base de datos, ejecuta los siguientes comandos en la terminal:
+dotnet ef migrations add InitialCreate
 dotnet ef database update
 
-4. Ejecutar el proyecto
+Ejecución del Proyecto
+Para ejecutar la aplicación, utiliza el siguiente comando:
 
-Inicia el servidor:
+dotnet run --project Demokrata
 
-dotnet run
-
-El API estará disponible en: http://localhost:5000.
-5. Explorar la documentación de la API
-
-Accede a Swagger en: http://localhost:5000/swagger.
-Endpoints
-Método	Endpoint	Descripción
-GET	/api/usuarios/{id}	Obtener un usuario por su ID.
-GET	/api/usuarios	Obtener todos los usuarios.
-GET	/api/usuarios/search	Buscar usuarios por nombre o apellido (paginado).
-POST	/api/usuarios	Crear un nuevo usuario.
-PUT	/api/usuarios/{id}	Actualizar un usuario existente.
-DELETE	/api/usuarios/{id}	Eliminar un usuario por su ID.
-Validaciones de usuario
-Campos obligatorios
-
-    Primer nombre: Máximo 50 caracteres, sin números.
-    Primer apellido: Máximo 50 caracteres, sin números.
-    Fecha de nacimiento: No puede estar vacía.
-    Sueldo: Mayor que 0.
-
-Campos opcionales
-
-    Segundo nombre: Máximo 50 caracteres, sin números.
-    Segundo apellido: Máximo 50 caracteres, sin números.
+La API estará disponible en http://localhost:5274/swagger para el entorno de desarrollo.
 
 Pruebas
-Tecnologías utilizadas
-
-    xUnit: Para pruebas unitarias.
-    Moq: Para simular dependencias.
-
-Ejecutar las pruebas
-
-Desde el directorio raíz del proyecto:
-
+Para ejecutar las pruebas, utiliza el siguiente comando:
 dotnet test
 
-Cobertura
 
-    Pruebas para UsuarioService validando lógica de negocio.
-    Pruebas para UsuariosController verificando las respuestas HTTP y validaciones.
 
-Tecnologías utilizadas
-
-    Framework: ASP.NET Core 8
-    ORM: Entity Framework Core
-    Base de datos: SQL Server
-    Pruebas: xUnit y Moq
-    Documentación: Swagger
-
-Colaboradores
-
-    Autor: [Tu nombre]
-    Contacto: [Tu email]
+Autor: Ruben DArio Hernandez
